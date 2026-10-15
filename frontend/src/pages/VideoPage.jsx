@@ -1,6 +1,16 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import Loader from "../components/Loader";
+
+function formatDuration(seconds) {
+  if (seconds == null) return "Unknown";
+
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+
+  return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
+}
 
 function VideoPage() {
   const location = useLocation();
@@ -8,6 +18,7 @@ function VideoPage() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
+  const [downloading, setDownloading] = useState(false);
 
   const url = location.state?.url;
   const platform = location.state?.platform;
@@ -77,15 +88,38 @@ function VideoPage() {
         </p>
 
         <div className="mt-5 space-y-3 text-sm">
-            {loading && <p className="text-indigo-400">Inspecting video</p>}
+            {loading && <Loader />}
             {error && <p className="text-red-500">{error}</p>}
+
+
             {data && (
-                <div className="space-y-2 rounded-xl border border-gray-800 bg-gray-950 p-4">
-                    <p>{data.message}</p>
-                    <p>{data.platform}</p>
-                    <p className="break-all">{data.url}</p>
+            <div className="mt-5 space-y-4 rounded-xl border border-gray-800 bg-gray-950 p-4">
+                {data.thumbnail && (
+                <img
+                    src={data.thumbnail}
+                    alt={data.title || "Video thumbnail"}
+                    className="w-full max-h-72 rounded-lg object-cover"
+                />
+                )}
+
+                <div>
+                <h2 className="text-xl font-semibold text-white">
+                    {data.title || "Untitled video"}
+                </h2>
+
+                <p className="mt-2 text-gray-400">
+                    Uploader: {data.uploader || "Unknown"}
+                </p>
+
+                <p className="mt-1 text-gray-400">
+                    Duration: {formatDuration(data.duration)}
+                </p>
                 </div>
+            </div>
             )}
+
+
+
         </div>
 
         <button
