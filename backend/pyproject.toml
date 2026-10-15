@@ -9,5 +9,6 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.143.1",
+    "yt-dlp>=2026.8.19",
 ]
 
