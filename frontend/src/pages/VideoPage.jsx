@@ -1,12 +1,46 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import api from "../services/api";
 
 function VideoPage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
+  const [error, setError] = useState("");
 
   const url = location.state?.url;
+  const platform = location.state?.platform;
 
-  if (!url) {
+
+  useEffect(()=>{
+    if(!url || !platform) return;
+
+    async function inspectVideo(){
+        setLoading(true);
+        setError("");
+        setData(null);
+
+        try{
+            const response = await api.post("/api/downloads/inspect", {
+                url,
+                platform
+            });
+
+            setData(response.data);
+        } catch(error) {
+            setError(error.response?.data?.detail || "something went wrong");
+        } finally {
+            setLoading(false)
+        }
+
+    }
+
+    inspectVideo()
+
+  }, [url, platform]);
+
+  if (!url || !platform) {
     return (
       <section className="min-h-full flex flex-col items-center justify-center px-6 py-16">
         <h1 className="text-2xl font-bold">
@@ -42,9 +76,17 @@ function VideoPage() {
           {url}
         </p>
 
-        <p className="text-gray-500 text-sm mt-5">
-          Next, we'll fetch the video information from the backend.
-        </p>
+        <div className="mt-5 space-y-3 text-sm">
+            {loading && <p className="text-indigo-400">Inspecting video</p>}
+            {error && <p className="text-red-500">{error}</p>}
+            {data && (
+                <div className="space-y-2 rounded-xl border border-gray-800 bg-gray-950 p-4">
+                    <p>{data.message}</p>
+                    <p>{data.platform}</p>
+                    <p className="break-all">{data.url}</p>
+                </div>
+            )}
+        </div>
 
         <button
           onClick={() => navigate("/")}

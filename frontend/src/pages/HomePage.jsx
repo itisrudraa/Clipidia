@@ -28,10 +28,26 @@ function HomePage() {
       return;
     }
 
-    setError("");
+    let hostname = parsedUrl.hostname.toLowerCase();
+    hostname = hostname.replace(/^www\./, "");
+    
+    let platform;
+    if(hostname==="youtube.com" || hostname === "youtu.be") platform = "youtube";
+    else if(hostname==="instagram.com") platform = "instagram";
+    else if(hostname==="x.com" || hostname==="twitter.com") platform = "x";
+    
+    if(!platform){
+        setError("Platform not supported");
+        return;
+    } 
 
+    setError("");
+    
     navigate("/video", {
-      state: { url: parsedUrl.href },
+      state: { 
+        url: parsedUrl.href,
+        platform
+      },
     });
   }
 
