@@ -51,6 +51,42 @@ function VideoPage() {
 
   }, [url, platform]);
 
+  async function handleDownload() {
+
+    setDownloading(true);
+    setError("");
+
+    try {
+      const response = await api.post(
+        "/api/downloads",
+        { url, platform },
+        {
+          responseType: "blob"
+        }
+      );
+
+      const blobUrl = window.URL.createObjectURL(response.data);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = "clipidia-video.webm";
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.setTimeout(() => {
+        window.URL.revokeObjectURL(blobUrl);
+      }, 1000);
+
+    } catch (error) {
+      setError("Download Failed");
+    } finally{
+      setDownloading(false);
+    }
+  }
+
+
   if (!url || !platform) {
     return (
       <section className="min-h-full flex flex-col items-center justify-center px-6 py-16">
@@ -115,6 +151,19 @@ function VideoPage() {
                     Duration: {formatDuration(data.duration)}
                 </p>
                 </div>
+
+                <button
+                  onClick={handleDownload}
+                  disabled={downloading}
+                  className="mt-4 flex w-full items-center justify-center gap-3 rounded-lg bg-indigo-600 px-5 py-3 font-medium text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {downloading && (
+                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  )}
+
+                  {downloading ? "Downloading..." : "Download video"}
+                </button>
+
             </div>
             )}
 

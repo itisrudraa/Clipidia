@@ -43,6 +43,6 @@ def download_video_endpoint(request: InspectRequest):
         background=BackgroundTask(
             shutil.rmtree,
             temp_dir,
-            ignore_error=True,
+            ignore_errors=True,
         ),
     )
