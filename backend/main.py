@@ -46,3 +46,9 @@ def download_video_endpoint(request: InspectRequest):
             ignore_errors=True,
         ),
     )
+
+@app.get("/health/tools")
+def check_tools():
+    return {
+        "ffmpeg": shutil.which("ffmpeg"),
+    }
