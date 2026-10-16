@@ -80,7 +80,7 @@ function VideoPage() {
       }, 1000);
 
     } catch (error) {
-      setError("Download Failed");
+      setError(error.response?.data?.detail || "Download Failed");
     } finally{
       setDownloading(false);
     }

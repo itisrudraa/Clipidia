@@ -7,6 +7,8 @@ import shutil
 import os
 from services.download_service import download_video
 from services.video_service import inspect_video
+from fastapi import HTTPException
+from yt_dlp.utils import DownloadError
 
 
 app = FastAPI(title="Clipidia API")
@@ -27,14 +29,29 @@ def home():
 
 @app.post("/api/downloads/inspect")
 def inspect_video_endpoint(request:InspectRequest):
-    info = inspect_video(str(request.url))
+    try:
+        info = inspect_video(str(request.url))
 
-    return{
-        "title":info.get("title"),
-        "thumbnail":info.get("thumbnail"),
-        "duration":info.get("duration"),
-        "uploader":info.get("uploader")
-    }
+        return{
+            "title":info.get("title"),
+            "thumbnail":info.get("thumbnail"),
+            "duration":info.get("duration"),
+            "uploader":info.get("uploader")
+        }
+    except: 
+        if request.platform == "youtube":
+            raise HTTPException(
+                status_code=502,
+                detail=(
+                    "YouTube is temporarily unavailable or restricting "
+                    "requests. Please try Instagram Reels or X instead."
+                ),
+            )
+
+        raise HTTPException(
+            status_code=502,
+            detail="Unable to retrieve this video right now. Please try again later.",
+        )
 
 @app.post("/api/downloads")
 def download_video_endpoint(request: InspectRequest):
@@ -49,9 +66,3 @@ def download_video_endpoint(request: InspectRequest):
             ignore_errors=True,
         ),
     )
-
-@app.get("/health/tools")
-def check_tools():
-    return {
-        "ffmpeg": shutil.which("ffmpeg"),
-    }
