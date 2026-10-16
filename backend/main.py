@@ -12,7 +12,10 @@ from services.video_service import inspect_video
 app = FastAPI(title="Clipidia API")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",  
+        "https://clipidia.vercel.app",
+    ],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
