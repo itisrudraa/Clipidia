@@ -7,7 +7,8 @@ def download_video(url: str):
     temp_dir = tempfile.mkdtemp(prefix="clipidia_")
 
     options = {
-        #"format": "best",
+        "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+        "merge_output_format": "mp4",
         "outtmpl": os.path.join(temp_dir, "video.%(ext)s"),
         "noplaylist": True,
         "quiet": True,

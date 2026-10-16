@@ -69,7 +69,7 @@ function VideoPage() {
 
       const link = document.createElement("a");
       link.href = blobUrl;
-      link.download = "clipidia-video.webm";
+      link.download = "clipidia-video.mp4";
 
       document.body.appendChild(link);
       link.click();
